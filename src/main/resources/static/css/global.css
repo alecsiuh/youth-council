@@ -1,0 +1,79 @@
+
+a {
+    cursor: pointer;
+}
+
+
+.bg-light-pink {
+    background-color: var(--light-pink);
+
+}
+
+.bg-pink-1 {
+    background-color: var(--pink);
+}
+
+.bg-pink-2 {
+    background-color: var(--pink-2);
+}
+
+.bg-pink-3 {
+    background-color: var(--pink-3);
+}
+
+.bg-pink-4 {
+    background-color: var(--pink-4);
+}
+
+
+/*******/
+/*Animations Start Here*/
+/*******/
+
+.transformable {
+    transition: transform 0.3s ease;
+}
+
+.transformable:hover {
+    transform: scale(1.09);
+}
+
+
+/*******/
+/*Animations End Here*/
+/*******/
+
+
+.yc-logo {
+    width: 40px;
+}
+
+.yc-logo-sidebar {
+    width: 10%;
+}
+
+
+/*******/
+/*Footer Starts Here*/
+/*******/
+@media screen and (max-width: 576px) {
+    #container {
+        margin-top: 20%;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    #container {
+        width: 100%;
+        flex-wrap: wrap;
+        margin-top: 250%;
+    }
+}
+
+/*******/
+/*Footer Ends Here*/
+/*******/
+
+.btn {
+    z-index: 2;
+}

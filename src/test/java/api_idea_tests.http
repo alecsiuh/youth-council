@@ -1,0 +1,84 @@
+### Get all ideas
+GET http://antwerpyouthcouncil.localhost:8080/api/ideas
+
+### Get idea with id 1
+GET http://antwerpyouthcouncil.localhost:8080/api/ideas/1
+
+
+### Get ideas of user
+GET http://antwerpyouthcouncil.localhost:8080/api/users/1/ideas
+
+### Post idea - should work
+//@no-cookie-jar
+POST http://antwerpyouthcouncil.localhost:8080/api/ideas
+Accept: application/json
+Content-Type: application/json
+Cookie: JSESSIONID=513E26D06D0AA2543BC9810C72164E41
+X-CSRF-TOKEN: fa37676f-b13f-4fd3-91bf-48a43e817859
+
+{
+  "description": "New idea!",
+  "images": [
+    "okayimage.jpg",
+    "goodimage.png",
+    "greatimage.jpg"
+  ],
+  "themeId": 1
+}
+
+### Post idea - should not work
+//@no-cookie-jar
+POST http://brusselsyouthcouncil.localhost:8080/api/ideas
+Accept: application/json
+Content-Type: application/json
+Cookie: JSESSIONID=513E26D06D0AA2543BC9810C72164E41
+X-CSRF-TOKEN: fa37676f-b13f-4fd3-91bf-48a43e817859
+
+{
+  "description": "New idea!",
+  "images": [
+    "okayimage.jpg",
+    "goodimage.png",
+    "greatimage.jpg"
+  ],
+  "themeId": 1
+}
+
+### Like idea
+//@no-cookie-jar
+POST http://antwerpyouthcouncil.localhost:8080/api/ideas/2/likes
+Accept: application/json
+Content-Type: application/json
+Content-Length: 0
+Cookie: JSESSIONID=513E26D06D0AA2543BC9810C72164E41
+X-CSRF-TOKEN: fa37676f-b13f-4fd3-91bf-48a43e817859
+
+### Remove idea
+//@no-cookie-jar
+DELETE http://antwerpyouthcouncil.localhost:8080/api/ideas/1/
+Accept: application/json
+Content-Type: application/json
+Content-Length: 0
+Cookie: JSESSIONID=513E26D06D0AA2543BC9810C72164E41
+X-CSRF-TOKEN: fa37676f-b13f-4fd3-91bf-48a43e817859
+
+### Remove idea like
+//@no-cookie-jar
+DELETE http://antwerpyouthcouncil.localhost:8080/api/ideas/2/likes
+Accept: application/json
+Content-Type: application/json
+Content-Length: 0
+Cookie: JSESSIONID=513E26D06D0AA2543BC9810C72164E41
+X-CSRF-TOKEN: fa37676f-b13f-4fd3-91bf-48a43e817859
+
+### Post comment on idea
+//@no-cookie-jar
+POST http://antwerpyouthcouncil.localhost:8080/api/ideas/1/comments
+Accept: application/json
+Content-Type: application/json
+Cookie: JSESSIONID=513E26D06D0AA2543BC9810C72164E41
+X-CSRF-TOKEN: fa37676f-b13f-4fd3-91bf-48a43e817859
+
+{
+  "content": "I agree, I don't think there are nearly enough study spaces at Karel de Grote."
+}

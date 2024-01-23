@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div th:fragment="user-sidebar">
+    <div class="l-navbar bg-dark" id="nav-bar">
+        <nav class="nav">
+            <div>
+                <a class="nav_logo" th:href="@{/}">
+                    <i class="bi bi-house"></i>
+                    <span class="nav_logo-name">Dashboard</span>
+                </a>
+                <div class="nav_list" id="sidebar_content">
+                    <a class="nav_link" id="settings" style="display: block;" th:href="@{/user/profile}">
+                        <i class="bi bi-gear"></i>
+                        <span class="nav_name" style="visibility: hidden;">Profile</span>
+                    </a>
+                    <a class="nav_link" id="ideas" style="display: block;" th:href="@{/user/user-ideas}">
+                        <i class="bi bi-lightbulb"></i>
+                        <span class="nav_name" style="visibility: hidden;">Ideas</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="mb-5"></div>
+</div>
+</body>
+</html>

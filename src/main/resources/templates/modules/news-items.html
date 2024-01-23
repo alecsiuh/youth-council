@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        xmlns:th="http://www.thymeleaf.org">
+<head>
+    <thymeleaf
+            th:replace="fragments/meta :: meta_script_link('Youth Council Platform')"></thymeleaf>
+    <script
+            defer
+            th:src="@{/js/index.js}"></script>
+    <link
+            rel="stylesheet"
+            th:href="@{/css/index.css}"/>
+    <script defer th:src="@{/js/forms/add_news_item.js}" type="module"></script>
+    <script defer th:src="@{/js/entities/interact_with_entity.js}" type="module"></script>
+    <script defer th:src="@{/js/common/search.js}" type="module"></script>
+    <script defer th:src="@{/js/delete/delete_news_item.js}" type="module"></script>
+</head>
+
+
+<body class="d-flex h-100 bg-dark">
+<div class="d-flex w-100 h-100 p-3 mx-auto flex-column top">
+
+    <div class="d-flex flex-row justify-content-between sticky-top rounded p-3"
+         th:include="fragments/header :: header(page='NONE')"></div>
+
+    <main class="px-3 d-flex flex-column h-100">
+        <div class="d-flex flex-column justify-content-center align-items-center text-light my-2" id="home">
+            <h1 class="animate-title display-2 h-100 p-2">News Items</h1>
+            <div class="input-group rounded w-50 d-flex justify-between align-items-end m-4">
+                <input aria-describedby="search-addon" aria-label="Search"
+                       class="form-control rounded border border-white"
+                       id="searchBar"
+                       placeholder="Search" type="search"/>
+                <span class="bg-transparent text-white m-2">
+                    <i class="bi bi-search"></i>
+                </span>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="align-self-center col-lg-6 position-relative" id="container"
+                 th:attr="data-news-item-id=${newsItem.id}" th:each="newsItem : ${newsItems}">
+                <!--            content-->
+                <div
+                        class="bg-light rounded-3 text-black border-dark g-0 border rounded overflow-hidden mb-4 d-flex shadow-sm h-md-250 position-relative w-auto h-auto"
+                >
+                    <div
+                            class="col p-4 d-flex flex-column position-static"
+                    >
+                        <h3 class="mb-0 text-start" th:text="${newsItem.getTitle()}"></h3>
+                        <div class="col d-flex gap-2">
+                            <!--                                time-->
+                            <div class="text-muted fs-6"
+                                 th:text="${newsItem.getAuthor()}">Author
+                            </div>
+                            &#x2022;
+                            <div class="text-muted fs-6"
+                                 th:text="${#temporals.format(newsItem.getDateAdded(), 'yyyy-MM-dd')}">Date
+                                /Time
+                            </div>
+                        </div>
+                        <span class="card-text mb-5 text-wrap" th:text="${newsItem.getContent()}">
+                        </span>
+                        <div class="d-flex flex-row gap-3">
+                            <!--                                like button-->
+                            <div
+                                    class="d-flex flex-row align-items-center"
+                                    role="button"
+                                    th:attr="onclick=|toggleLike(${newsItem.getId()},'news-items')|"
+                                    th:id="|like-container-${newsItem.getId()}|"
+                            >
+
+                                <svg
+                                        class="transformable"
+                                        height="24"
+                                        th:style="|fill: ${newsItem.isLikedByUser() ? 'red' : 'black'}|"
+                                        viewBox="0 0 24 24"
+                                        width="24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                            d="M20.205 4.791a5.938 5.938 0 0 0-4.209-1.754A5.906 5.906 0 0 0 12 4.595a5.904 5.904 0 0 0-3.996-1.558 5.942 5.942 0 0 0-4.213 1.758c-2.353 2.363-2.352 6.059.002 8.412L12 21.414l8.207-8.207c2.354-2.353 2.355-6.049-.002-8.416z"
+                                    ></path>
+                                </svg>
+                                <p class="small text-black mb-0"
+                                   th:text="${newsItem.getNumberOfLikes()}"></p>
+                            </div>
+                            <!--                                end like button-->
+                            <div class="position-absolute end-0 top-0 m-2">
+                                <button
+                                        class="btn btn-danger delete-news-item"
+                                        sec:authorize="hasRole('ROLE_YOUTH_COUNCIL_ADMINISTRATOR') or hasRole('ROLE_YOUTH_COUNCIL_MODERATOR')"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    end content-->
+                    <!--            image-->
+                    <div class="col-auto d-none d-lg-flex">
+                        <img alt="Section Image" src="https://picsum.photos/200/250"/>
+                    </div>
+                    <!--            end image-->
+                </div>
+            </div>
+        </div>
+    </main>
+    <!--    ADD BUTTON-->
+    <div class="container sticky-bottom mt-5" sec:authorize="hasRole('ROLE_YOUTH_COUNCIL_ADMINISTRATOR')">
+        <button
+                class="btn btn-success lg-rounded shadow position-absolute bottom-0 end-0 mb-5 me-5"
+                data-bs-target="#create-news-item-modal" data-bs-toggle="modal"
+        >
+            <svg
+                    fill="none"
+                    height="48"
+                    stroke="white"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="48"
+                    xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                        d="M12 4.5v15m7.5-7.5h-15"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                />
+            </svg>
+        </button>
+    </div>
+    <div aria-hidden="true" aria-labelledby="news-item-submission-modal-label"
+         class="modal fade" id="create-news-item-modal"
+         sec:authorize="hasRole('ROLE_YOUTH_COUNCIL_ADMINISTRATOR')" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-center" id="news-item-submission-modal-label">Create
+                        News Item</h1>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" enctype="multipart/form-data" id="submitForm" method="POST"
+                          novalidate>
+                        <div class="form-group mb-3">
+                            <label for="title">Title</label>
+                            <input class="form-control" id="title" name="title" required type="text">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="content">Content</label>
+                            <input class="form-control" id="content" name="content" required
+                                   type="text">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="image">Image</label>
+                            <input accept="image/*" class="form-control" id="image" name="image" required
+                                   type="file">
+                        </div>
+                        <div class="form-group mt-3 mb-5 d-flex align-items-center justify-content-center">
+                            <button class="btn btn-primary" id="submit-news-item" type="submit">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--			END ADD BUTTON-->
+    <div th:include="fragments/footer :: footer"></div>
+</div>
+</body>
+</html>

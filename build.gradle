@@ -1,0 +1,78 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.4'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+}
+
+group = 'be.kdg'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    runtimeOnly 'com.h2database:h2'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.webjars:bootstrap:5.2.3'
+    runtimeOnly 'org.hsqldb:hsqldb:2.7.1'
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    // https://mvnrepository.com/artifact/com.google.cloud.sql/postgres-socket-factory
+    implementation 'com.google.cloud.sql:postgres-socket-factory:1.11.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.webjars:webjars-locator:0.45'
+    implementation 'org.webjars.npm:bootstrap-icons:1.9.1'
+    implementation group: 'org.webjars', name: 'd3js', version: '6.7.0'
+    implementation group: 'org.webjars.npm', name: 'topojson', version: '3.0.2'
+    implementation 'com.google.cloud:spring-cloud-gcp-dependencies:4.1.4'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter-sql-postgresql:4.1.2'
+    implementation 'org.webjars:chartjs:4.1.2'
+
+}
+
+apply plugin: 'java'
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'be.kdg.youth_council_project.YouthCouncilProjectApplication'
+        )
+    }
+}
+dependencyManagement {
+    imports {
+        mavenBom 'com.google.cloud:spring-cloud-gcp-dependencies:4.3.0'
+    }
+}
+
+bootJar {
+    archiveFileName = "fatjar.jar"
+    enabled = true
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed"
+    }
+}
+

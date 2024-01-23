@@ -1,0 +1,66 @@
+image: fifek/int4:latest
+
+# Stages, which define when to run the jobs. For example, stages that run tests after stages that compile the code.
+stages:
+  - Build
+  - Test
+  - Deploy
+  - Destroy
+
+# build job in Build stage
+build:
+  #  image: openjdk:17-alpine
+  stage: Build
+  script:
+    - ./gradlew assemble
+  # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 hour
+
+# test job in Test stage
+test:
+#  image: openjdk:17-alpine
+  stage: Test
+  script:
+    - ./gradlew test
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/TEST-*.xml
+    expire_in: 1 hour
+
+# deploy job in Deploy stage
+deploy:
+  stage: Deploy
+  needs:
+    - test
+    - build
+  script:
+    - echo $GOOGLE_SERVICE_ACCOUNT_FILE > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - gcloud config set project "$GOOGLE_PROJECT_ID"
+    - gsutil rm -a gs://yc-01/fatjar.jar
+    - gsutil cp build/libs/fatjar.jar  gs://yc-01/fatjar.jar
+    - chmod +x ./scripts/deploy.sh
+    - ./scripts/deploy.sh # deploy script to deploy the application
+  only:
+    refs:
+      - main
+
+      # destroy job in Destroy stage
+destroy:
+  stage: Destroy
+  when: manual
+  needs:
+    - deploy
+  script:
+    - echo $GOOGLE_SERVICE_ACCOUNT_FILE > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - gcloud config set project "$GOOGLE_PROJECT_ID"
+    - chmod +x ./scripts/destroy.sh
+    - ./scripts/destroy.sh # destroy script to remove the deployed application
+  only:
+    refs:
+      - main

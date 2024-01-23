@@ -1,0 +1,623 @@
+@startuml YouthCouncilDesignClassDiagram
+
+left to right direction
+
+skinparam linetype ortho
+
+package domain{
+
+    class User{
+        - id : long
+        - email : String
+        - password : String
+        - firstName : String
+        - lastName : String
+        - postCode : int
+    }
+
+class Module<T>{
+    - id : long
+    - description : String
+    - items : List<T>
+}
+
+note left
+    The modules are the building blocks of a website, they are the sections that we can enable or disable.
+    The T is a generic type that can be any of the following:
+    - ActionPoint
+    - NewsItem
+    - Activity
+    - Idea
+    - Footer
+    - Questionnaire
+    - and more..
+end note
+
+    class WebPage{
+        - id : long
+        - title : String
+    }
+    class Section{
+        - id : long
+        - header : String
+        - body : String
+        - image : String
+    }
+
+    class HashMap{
+
+    }
+    note left
+        This is a hashmap that's inside WebPage
+    end note
+    enum Element{
+        IDEAS
+        ACTION_POINTS
+        NEWS_ITEMS
+        ACTIVITIES
+        CALL_FOR_IDEAS
+        QUESTIONNAIRE
+        FOOTER
+    }
+
+    class YouthCouncil{
+        - id : long
+        - name : String
+        - logo : String
+    }
+
+    class Municipality{
+        - id : long
+        - name : String
+        - postCodes : List<Integer>
+    }
+    class Membership{
+        - id : long
+        - joinDate : LocalDateTime
+        - role : Role
+    }
+
+
+    enum Role{
+        MEMBER
+        YOUUTH_COUNCIL_MODERATOR
+        YOUTH_COUNCIL_ADMINISTRATOR
+    }
+    package style{
+    class Style{
+        - id : long
+        - primaryColor : Color
+        - secondaryColor : Color
+        - font : Font
+    }
+    enum Font{
+        ARIAL
+        TIMES_NEW_ROMAN
+        COURIER_NEW
+        CALIBRI
+        COMIC_SANS_MS
+    }
+
+    enum Color{
+        RED
+        GREEN
+        BLUE
+        YELLOW
+        BLACK
+        WHITE
+    }
+
+    }
+
+    package YouthCouncilItems{
+        enum ActionPointStatus{
+            BEFORE_ELECTION
+            NOT_INCLUDED
+            INCLUDED
+            IN_PROGRESS
+            REALIZED
+        }
+        enum SocialMedia{
+            FACEBOOK
+            TWITTER
+            INSTAGRAM
+            LINKEDIN
+        }
+        class SocialMediaLink{
+            - id : long
+            - socialMedia : SocialMedia
+            - link : String
+        }
+        class ActionPoint{
+            - id : long
+            - status : ActionPointStatus
+            - title : String
+            - video : String
+            - description : String
+            - images : List<String>
+            - dateAdded : LocalDateTime
+            - likes : long
+        }
+
+        ActionPoint "1" --> "*" user::User : "followers"
+        Idea  "*" --> "1" user::User : "author"
+
+
+        class NewsItem{
+            - id : long
+            - title : String
+            - content : String
+            - image : String
+        }
+
+        class Activity{
+            - id : long
+            - startDateTime: LocalDateTime
+            - endDateTime:  LocalDateTime
+            - name : String
+            - description : String
+        }
+
+        class Theme{
+            - id : long
+            - name : String
+        }
+        class StandardAction{
+            - id : long
+            - theme : Theme
+            - name : String
+        }
+
+        class Idea{
+            - id : long
+            - description : String
+            - images : List<String>
+            - dateAdded : LocalDateTime
+            - likes : long
+        }
+        class Comment{
+            - id : long
+            - content : String
+            - likes : long
+            - dateAdded : LocalDateTime
+            }
+        Comment "1" --> "1" user::User : "author"
+
+         package Questionnaire{
+            class Questionnaire{
+                - id : long
+                - title : String
+                - description : String
+                - dateAdded : LocalDateTime
+            }
+            class Question{
+                - id : long
+                - question : String
+            }
+            class Answer{
+                - id : long
+                - answer : String
+            }
+            class ClosedQuestion{
+                - options: List<String>
+                - multipleChoice : boolean
+            }
+
+    }
+}
+}
+package repository{
+    interface JpaRepository{
+    }
+    interface YouthCouncilRepository{
+        + existsById(id: long) : boolean
+        + findYouthCouncilById(id: long) : YouthCouncil
+    }
+    interface IdeaRepository{
+    }
+    interface ModuleRepository{
+    }
+    interface ActionPointRepository{
+        + findActionPointByYouthCouncilIdFilterByThemeId(youthCouncilId: long, themeId: long) : List<ActionPoint>
+    }
+    interface NewsItemRepository{
+    }
+    interface ActivityRepository{
+    }
+    interface QuestionnaireRepository{
+    }
+    interface WebPageRepository{
+    }
+    interface QuestionRepository{
+    }
+    interface UserRepository{
+    }
+    interface ThemeRepository{
+    }
+    interface StandardActionRepository{
+    }
+
+    service::UserServiceImpl --> UserRepository
+    service::YouthCouncilServiceImpl --> YouthCouncilRepository
+    service::IdeaServiceImpl --> IdeaRepository
+    service::ActionPointServiceImpl --> ActionPointRepository
+    service::NewsItemServiceImpl --> NewsItemRepository
+    service::ActivityServiceImpl --> ActivityRepository
+    service::ModuleServiceImpl --> ModuleRepository
+    service::QuestionnaireServiceImpl --> QuestionnaireRepository
+    service::WebPageServiceImpl --> WebPageRepository
+    service::QuestionServiceImpl --> QuestionRepository
+    service::ThemeServiceImpl --> ThemeRepository
+    service::StandardActionServiceImpl --> StandardActionRepository
+
+
+}
+package util{
+    interface Builder{
+        + reset() : WebPage
+        + buildModule(element: Element, Module module) : void
+        + buildSection(Section section) : void
+        + getResult() : WebPage
+    }
+
+    class WebPageBuilder{
+        - result : WebPage
+        + reset() : WebPage
+        + buildModule(element: Element, Module module) : void
+        + buildSection(Section section) : void
+        + getResult() : WebPage
+    }
+}
+package controller{
+            class UserController{
+
+                    }
+
+                    class QuestionnaireController{
+                     + addQuestionToQuestionnaire(questionnaireId: long, question: Question)
+                     + removeQuestionFromQuestionnaire(questionId: long)
+                    }
+                    class QuestionController{
+                        + createQuestion(question: Question): ResponseEntity<Question>
+                        + deleteQuestion(questionId: long): ResponseEntity<Void>
+                    }
+
+                    class ActionPointController{
+                        + getActionPointsByTheme(youthCouncilId: long, themeId: long): ResponseEntity<List<ActionPoint>>
+                        + getActionPoints(youthCouncilId: long): ResponseEntity<List<ActionPoint>>
+                        + getActionPointById(actionPointId: long): ResponseEntity<ActionPoint>
+                        + addActionPoint(youthCouncilId: long, actionPoint: ActionPoint): ResponseEntity<ActionPoint>
+                    }
+
+                    class NewsItemController{
+                    }
+                    class ModuleController{
+                    }
+
+                    class ActivityController{
+                    }
+
+                    class IdeaController{
+                        + submitIdea(youthCouncilId: long, newIdeaDto: NewIdeaDto): ResponseEntity<IdeaDto>
+                    }
+
+                    class WebPageController{
+                    }
+                    class ThemeController{
+                    }
+                    class StandardActionController{
+                    }
+
+
+            class YouthCouncilController{
+            }
+            QuestionnaireController ..> questionnaire::Questionnaire
+            ActionPointController ..> actionPoint::ActionPoint
+            NewsItemController ..> newsItem::NewsItem
+            ActivityController ..> activity::Activity
+            IdeaController ..> idea::Idea
+            WebPageController ..> webPage::WebPage
+            ThemeController ..> theme::Theme
+            StandardActionController ..> standardAction::StandardAction
+            YouthCouncilController ..> youthCouncil::YouthCouncil
+            UserController ..> user::User
+            QuestionController ..> question::Question
+            ModuleController ..> module::Module
+
+            package dto{
+                class ActionPointDto{
+                    - id : long
+                    - status : Status
+                    - title : String
+                    - video : String
+                    - description : String
+                    - images : List<String>
+                    - dateAdded : LocalDateTime
+                    - likes : long
+                    - comments : List<CommentDto>
+                }
+                class CommentDto{
+                    - id : long
+                    - content : String
+                    - likes : long
+                    - dateAdded : LocalDateTime
+                    - authorName : String
+                    - authorId : long
+                }
+                class UserDto{
+                    id: long
+                    firstName : String
+                    lastName : String
+                    email : String
+                    postCode : int
+                }
+
+                class NewsItemDto{
+                    - id : long
+                    - title : String
+                    - content : String
+                    - image : String
+                }
+
+                class ActivityDto{
+                    - id : long
+                    - startTime : LocalDateTime
+                    - endTime : LocalDateTime
+                    - name : String
+                    - description : String
+                }
+                class newActivityDto{
+                    - startTime : LocalDateTime
+                    - endTime : LocalDateTime
+                    - name : String
+                    - description : String
+                }
+
+                class ThemeDto{
+                    - id: long
+                    - name: String
+                    - standardActions : List<StandardActionDto>
+                }
+                class StandardActionDto{
+                    - id: long
+                    - name: String
+                }
+
+                class IdeaDto{
+                    - id: long
+                    - description: String
+                    - images: List<String>
+                    - themeName: String
+                    - authorName: String
+                    - dateAdded: LocalDateTime
+                    - likes: long
+                    - comments: List<CommentDto>
+                    - 
+                }
+                class NewIdeaDto{
+                    - description: String
+                    - images: List<String>
+                    - themeId: long
+                    - authorId: long
+                }
+                class QuestionnaireDto{
+                    - id : long
+                    - title : String
+                    - description : String
+                    - questions : List<QuestionDto>
+                }
+                class QuestionDto{
+                    - id : long
+                    - questionText : List<String>
+                }
+                class QuestionAnswerDto{
+                    - id : long
+                    - answer : String
+                    - userId : long
+                }
+                class YouthCouncilDto{
+                    - id : long
+                    - name : String
+                    - description : String
+                    - logo : String
+                }
+            }
+}
+
+package service{
+        interface UserService{
+            +findUserById(userId: long): User
+        }
+
+        interface QuestionnaireService{
+        }
+        interface QuestionService{
+        }
+
+        interface ActionPointService{
+            + findActionPointByThemeId(youthCouncilId: long, themeId: long): List<ActionPoint>
+            + findActionPointByYouthCouncilIdFilterByThemeId(youthCouncilId: long, themeId: long) : List<ActionPoint>
+        }
+
+        interface NewsItemService{
+        }
+
+        interface QuestionService{
+        }
+
+        interface ActivityService{
+        }
+        interface ModuleService{
+        }
+
+        interface IdeaService{
+            + createIdea(idea: Idea): Idea
+        }
+
+        interface WebPageService{
+        }
+
+        interface YouthCouncilService{
+            + getYouthCouncilById(youthCouncilId: long): YouthCouncil
+        }
+
+        class UserServiceImpl{
+            +findUserById(userId: long): User
+        }
+
+        class QuestionnaireServiceImpl{
+        }
+        class QuestionServiceImpl{
+        }
+
+        class ActionPointServiceImpl{
+            - youthCouncilRepository: YouthCouncilRepository
+            + findActionPointByThemeId(youthCouncilId: long, themeId: long): List<ActionPoint>
+            + findActionPointByYouthCouncilIdFilterByThemeId(youthCouncilId: long, themeId: long) : List<ActionPoint>
+        }
+
+        class NewsItemServiceImpl{
+        }
+
+        class ActivityServiceImpl{
+        }
+        class ModuleServiceImpl{
+        }
+
+        class IdeaServiceImpl{
+            - youthCouncilRepository: YouthCouncilRepository
+            - userRepository: UserRepository
+            + createIdea(idea: Idea): Idea
+        }
+
+        class WebPageServiceImpl{
+        }
+
+        class YouthCouncilServiceImpl{
+            + getYouthCouncilById(youthCouncilId: long): YouthCouncil
+        }
+        interface ThemeService{
+        }
+        class ThemeServiceImpl{
+        }
+        interface StandardActionService{
+        }
+        class StandardActionServiceImpl{
+        }
+
+        controller::UserController --> UserServiceImpl
+        controller::QuestionnaireController --> QuestionnaireServiceImpl
+        controller::QuestionController --> QuestionServiceImpl
+        controller::ActionPointController --> ActionPointServiceImpl
+        controller::NewsItemController --> NewsItemServiceImpl
+        controller::ActivityController --> ActivityServiceImpl
+        controller::ModuleController --> ModuleServiceImpl
+        controller::IdeaController --> IdeaServiceImpl
+        controller::WebPageController --> WebPageServiceImpl
+        controller::YouthCouncilController --> YouthCouncilServiceImpl
+        controller::ThemeController --> ThemeServiceImpl
+        controller::StandardActionController --> StandardActionServiceImpl
+
+        
+        ActionPointServiceImpl ..> user::User
+        ActionPointServiceImpl ..> actionPoint::ActionPoint
+        IdeaServiceImpl ..> idea::Idea
+        IdeaServiceImpl ..> youthCouncil::YouthCouncil
+        UserServiceImpl ..> user::User
+        YouthCouncilServiceImpl ..> youthCouncil::YouthCouncil
+        ThemeServiceImpl ..> theme::Theme
+        StandardActionServiceImpl ..> standardAction::StandardAction
+        QuestionnaireServiceImpl ..> questionnaire::Questionnaire
+        QuestionServiceImpl ..> question::Question
+        NewsItemServiceImpl ..> newsItem::NewsItem
+        ActivityServiceImpl ..> activity::Activity
+        ModuleServiceImpl ..> module::Module
+        WebPageServiceImpl ..> webPage::WebPage
+
+
+}
+
+
+
+
+
+    YouthCouncil "*" --> "*" User
+    (YouthCouncil, User) . Membership
+
+
+
+
+
+    Questionnaire "1" --> "*" Question
+    Question "1" --> "*" Answer
+    ClosedQuestion --|> Question
+    Answer "*" --> "1" User
+
+
+    Municipality "1" <-- "1" YouthCouncil
+    YouthCouncil "1"-->"1" Style
+    YouthCouncil "1" --> "*" WebPage
+
+    YouthCouncil "1" --> "*" ActionPoint
+    YouthCouncil "1" --> "*" NewsItem
+    YouthCouncil "1" --> "*" Activity
+    YouthCouncil "1" --> "*" Idea
+    YouthCouncil "1" --> "1" Questionnaire
+    YouthCouncil "1" --> "*" SocialMediaLink
+
+
+    ActionPoint "*" --> "1" Theme
+    ActionPoint "1" --> "*" Idea : "linked idea"
+    Idea "*" --> "1" StandardAction
+    Theme "1" <-- "*" StandardAction
+    Idea "1" --> "*" Comment
+    ActionPoint "1" --> "*" Comment
+
+
+
+    WebPage "1" <-- "1" WebPageBuilder
+    WebPageBuilder ..|> Builder
+    WebPage "1" --> "1" HashMap
+    HashMap "1" --> "*" Module : "value"
+    HashMap "1" --> "*" Element : "key"
+    WebPage "1" --> "*" Section
+
+
+    UserServiceImpl ..|> UserService
+
+    QuestionnaireServiceImpl ..|> QuestionnaireService
+    ActionPointServiceImpl ..|> ActionPointService
+    NewsItemServiceImpl ..|> NewsItemService
+    ActivityServiceImpl ..|> ActivityService
+    ModuleServiceImpl ..|> ModuleService
+    IdeaServiceImpl ..|> IdeaService
+    WebPageServiceImpl ..|> WebPageService
+    YouthCouncilServiceImpl ..|> YouthCouncilService
+    ThemeServiceImpl ..|> ThemeService
+    StandardActionServiceImpl ..|> StandardActionService
+    QuestionServiceImpl ..|> QuestionService
+
+    ' all repositories extend jparepository
+    UserRepository ..|> JpaRepository
+    YouthCouncilRepository ..|> JpaRepository
+    ActionPointRepository ..|> JpaRepository
+    NewsItemRepository ..|> JpaRepository
+    ActivityRepository ..|> JpaRepository
+    ModuleRepository ..|> JpaRepository
+    IdeaRepository ..|> JpaRepository
+    WebPageRepository ..|> JpaRepository
+    ThemeRepository ..|> JpaRepository
+    StandardActionRepository ..|> JpaRepository
+    QuestionRepository ..|> JpaRepository
+
+
+
+
+
+
+
+
+
+
+
+@enduml
